@@ -1,0 +1,10 @@
+Need to install the autotools of automake and autoconf. In a debian-based linux distro (Ubuntu, etc),
+should just need to run as superuser (or use sudo):
+
+apt-get install automake
+apt-get install autoconf
+
+Then in the project directory, run autoreconf -i to have it set up the configure script and install the files it needs.
+Then run: ./configure to generate the makefiles.
+Then run: make
+
