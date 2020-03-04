@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# autoreconf -i Generated Files
+autom4te.cache/
+aclocal.m4
+configure
+config.h.in
+build-aux/
+COPYING
