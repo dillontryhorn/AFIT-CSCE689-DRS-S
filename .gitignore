@@ -48,3 +48,6 @@ config.log
 config.status
 Makefile
 Makefile.in
+
+# Generated Executable
+src/divfinder

@@ -4,6 +4,9 @@ should just need to run as superuser (or use sudo):
 apt-get install automake
 apt-get install autoconf
 
+You will need the C++ Boost Libraries
+sudo apt-get install libboost-all-dev 
+
 Then in the project directory, run autoreconf -i to have it set up the configure script and install the files it needs.
 Then run: ./configure to generate the makefiles.
 Then run: make
