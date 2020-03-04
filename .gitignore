@@ -37,7 +37,6 @@ aclocal.m4
 configure
 config.h.in
 build-aux/
-COPYING
 
 # Automake Generated Files
 include/stamp-h1
