@@ -31,10 +31,20 @@
 *.out
 *.app
 
-# autoreconf -i Generated Files
+# Autoreconf Generated Files
 autom4te.cache/
 aclocal.m4
 configure
 config.h.in
 build-aux/
 COPYING
+
+# Automake Generated Files
+include/stamp-h1
+src/.deps/
+src/Makefile
+src/Makefile.in
+config.log
+config.status
+Makefile
+Makefile.in
