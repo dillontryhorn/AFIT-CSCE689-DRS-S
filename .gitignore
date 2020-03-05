@@ -35,10 +35,12 @@
 autom4te.cache/
 aclocal.m4
 configure
-config.h.in
+include/config.h.in
+include/config.h.in~
 build-aux/
 
 # Automake Generated Files
+include/config.h
 include/stamp-h1
 src/.deps/
 src/Makefile

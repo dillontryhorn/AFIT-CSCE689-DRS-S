@@ -27,9 +27,9 @@ AC_DEFINE([LARGESIGNED2X], [int512_t], ["Signed int made of twice the bits as LA
 
 # Checks for library functions.
 AC_CHECK_FUNCS([bzero socket strtol select])
-# For Homework 2
-#AC_CHECK_LIB([argon2], [argon2i_hash_raw], [], [
-#   echo "You are missing libargon2. It is required for password authentication."
+# Boost Libraries
+#AC_CHECK_LIB([boost_multiprecision], [gcd], [], [
+#   echo "You are missing the boost libraries. It is required for password authentication."
 #   exit -1;
 #   ])
 
