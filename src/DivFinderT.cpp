@@ -112,13 +112,21 @@ void DivFinderT::factor(LARGEINT n) {
    while (!div_found)
    {
       LARGEINT divisor; // try to get a divisor by brute6
-      if (isPrimeBF(n, divisor)) // launch a thread on this is Prime call
+      if (isPrimeBF(n, divisor)) // launch a thread on this isPrime call
       {
          if (verbose >= 2)
             std::cout << "Prime found: " << n << std::endl;
          primes.push_back(n);
          return;
-      }
+      } // if returns true n is prime, else divisor is set
+      else
+      {   // We found a prime divisor, save it and keep finding primes
+	      if (verbose >= 2)
+	         std::cout << "Prime found: " << divisor << std::endl;
+	      primes.push_back(divisor);
+	      return factor(n / divisor); // obsiusly dont try to factor the prime
+	   }				
+      
 
       // We try to get a divisor using Pollards Rho, might need to stop and rerandomize
       LARGEINT d = calcPollardsRho(n); // launch of bunch of threads on this
