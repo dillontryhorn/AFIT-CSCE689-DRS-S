@@ -108,53 +108,33 @@ void DivFinderT::factor(LARGEINT n) {
       std::cout << "Factoring: " << n << std::endl;
 
    bool div_found = false;
-   unsigned int iters = 0;
 
    while (!div_found)
    {
-      if (verbose >= 3)
-         std::cout << "Starting iteration: " << iters << std::endl;
-
-      // If we have tried Pollards Rho a specified number of times, run the
-      // costly prime check to see if this is a prime number. Also, increment
-      // iters after the check
-      if (iters++ == primecheck_depth)
+      LARGEINT divisor; // try to get a divisor by brute6
+      if (isPrimeBF(n, divisor)) // launch a thread on this is Prime call
       {
          if (verbose >= 2)
-	         std::cout << "Pollards rho timed out, checking if the following is prime: " << n << std::endl;
-	      LARGEINT divisor;
-         if (isPrimeBF(n, divisor))
-         {
-	         if (verbose >= 2)
-	            std::cout << "Prime found: " << n << std::endl;
-            primes.push_back(n);
-	         return;
-	      } 
-         else
-         {   // We found a prime divisor, save it and keep finding primes
-	         if (verbose >= 2)
-	            std::cout << "Prime found: " << divisor << std::endl;
-	         primes.push_back(divisor);
-	         return factor(n / divisor);
-	      }				
+            std::cout << "Prime found: " << n << std::endl;
+         primes.push_back(n);
+         return;
       }
 
-      // We try to get a divisor using Pollards Rho
-      LARGEINT d = calcPollardsRho(n);
+      // We try to get a divisor using Pollards Rho, might need to stop and rerandomize
+      LARGEINT d = calcPollardsRho(n); // launch of bunch of threads on this
       if (d != n)
       {
          if (verbose >= 1)
             std::cout << "Divisor found: " << d << std::endl;
 
          // Factor the divisor
-         factor(d);
+         factor(d); // this is the recursive call, need to figure how to split
+                     // the threads with factoring d and n/d which is the line under
 
          // Now the remaining number
          factor((LARGEINT) (n/d));
          return;
-      }
-
-      // If d == n, then we re-randomize and continue the search up to the prime check depth
+      }	
    }
    throw std::runtime_error("Reached end of function--this should not have happened.");
    return;
