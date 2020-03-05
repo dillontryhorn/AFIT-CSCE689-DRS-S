@@ -21,6 +21,10 @@ AC_TYPE_SSIZE_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT8_T
 
+AC_DEFINE([LARGEINT], [uint128_t], ["Unsigned int type to hold original value and calculations"])
+AC_DEFINE([LARGEINT2X], [uint256_t], ["Unsigned int twice as large as LARGEINT (bit-wise)"])
+AC_DEFINE([LARGESIGNED2X], [int512_t], ["Signed int made of twice the bits as LARGEINT2X"])
+
 # Checks for library functions.
 AC_CHECK_FUNCS([bzero socket strtol select])
 # For Homework 2
