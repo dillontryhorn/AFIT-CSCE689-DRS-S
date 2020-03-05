@@ -1,12 +1,12 @@
-#ifndef DIVFINDERSP_H
-#define DIVFINDERSP_H
+#ifndef DIVFINDERT_H
+#define DIVFINDERT_H
 
 #include <string>
 #include "DivFinder.h"
 #include <boost/multiprecision/cpp_int.hpp>
 
 // If factor has been called on a number x times, check to see if the number is prime
-const unsigned int primecheck_depth = 10;
+//const unsigned int primecheck_depth = 10;
 
 /******************************************************************************************
  * DivFinderSP - Used as a recursive calculator for prime numbers using Pollards Rho algorithm.
