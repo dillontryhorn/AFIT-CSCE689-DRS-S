@@ -44,6 +44,8 @@ bool DivFinderT::isPrimeBF(LARGEINT n, LARGEINT &divisor) {
    // Assumes all primes are to either side of 6k. Using 256 bit to avoid overflow
    // issues when calculating max range
    LARGEINT2X n_256t = n;
+   #pragma omp parallel
+   #pragma omp for
    for (LARGEINT2X k=5; k * k < n_256t; k = k+6) {
       if ((n_256t % k == 0) || (n_256t % (k+2) == 0)) {
          divisor = (LARGEINT) k;
