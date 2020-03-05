@@ -110,33 +110,39 @@ void DivFinderT::factor(LARGEINT n) {
    bool div_found = false;
    unsigned int iters = 0;
 
-   while (!div_found) {
+   while (!div_found)
+   {
       if (verbose >= 3)
          std::cout << "Starting iteration: " << iters << std::endl;
 
       // If we have tried Pollards Rho a specified number of times, run the
       // costly prime check to see if this is a prime number. Also, increment
       // iters after the check
-      if (iters++ == primecheck_depth) {
+      if (iters++ == primecheck_depth)
+      {
          if (verbose >= 2)
-	    std::cout << "Pollards rho timed out, checking if the following is prime: " << n << std::endl;
-	 LARGEINT divisor;
-         if (isPrimeBF(n, divisor)) {
-	    if (verbose >= 2)
-	       std::cout << "Prime found: " << n << std::endl;
+	         std::cout << "Pollards rho timed out, checking if the following is prime: " << n << std::endl;
+	      LARGEINT divisor;
+         if (isPrimeBF(n, divisor))
+         {
+	         if (verbose >= 2)
+	            std::cout << "Prime found: " << n << std::endl;
             primes.push_back(n);
-	    return;
-	 } else {   // We found a prime divisor, save it and keep finding primes
-	    if (verbose >= 2)
-	       std::cout << "Prime found: " << divisor << std::endl;
-	    primes.push_back(divisor);
-	    return factor(n / divisor);
-	 }				
+	         return;
+	      } 
+         else
+         {   // We found a prime divisor, save it and keep finding primes
+	         if (verbose >= 2)
+	            std::cout << "Prime found: " << divisor << std::endl;
+	         primes.push_back(divisor);
+	         return factor(n / divisor);
+	      }				
       }
 
       // We try to get a divisor using Pollards Rho
       LARGEINT d = calcPollardsRho(n);
-      if (d != n) {
+      if (d != n)
+      {
          if (verbose >= 1)
             std::cout << "Divisor found: " << d << std::endl;
 
