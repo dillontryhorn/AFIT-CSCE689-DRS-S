@@ -2,7 +2,7 @@ bin_PROGRAMS = divfinder
 
 
 divfinder_SOURCES = main.cpp DivFinder.cpp DivFinderSP.cpp DivFinderT.cpp
-# tcpserver_LDFLAGS = -largon2
+divfinder_LDFLAGS = -pthread
 
 #tcpclient_SOURCES = client_main.cpp Client.cpp TCPClient.cpp strfuncts.cpp
 
