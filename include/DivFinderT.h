@@ -2,6 +2,8 @@
 #define DIVFINDERT_H
 
 #include <string>
+#include <map>
+#include <atomic>
 #include "DivFinder.h"
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -32,6 +34,8 @@ class DivFinderT : public DivFinder {
       virtual void PolRho() override;
 
       bool isPrimeBF(LARGEINT n, LARGEINT &divisor);
+
+      std::map<std::string, std::atomic_bool> atomicTable;
 
    protected:
 

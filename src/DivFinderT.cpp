@@ -2,8 +2,11 @@
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
+#include <map>
+#include <atomic>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/integer/common_factor.hpp>
+#include <boost/lexical_cast.hpp>
 
 DivFinderT::DivFinderT(LARGEINT number, unsigned int threads):DivFinder(number),_num_threads(threads) {
 }
@@ -98,6 +101,11 @@ void DivFinderT::PolRho() {
  ******************************************************************************/
 
 void DivFinderT::factor(LARGEINT n) {
+
+   std::string bignumstr;
+   bignumstr  = boost::lexical_cast<std::string>(n);
+   std::atomic_bool aBool = ATOMIC_VAR_INIT(false);
+   this->atomicTable.insert(std::pair<std::string, std::atomic_bool>(bignumstr, aBool));
 
    // already prime
    if (n == 1) {
