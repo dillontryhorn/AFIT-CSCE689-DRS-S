@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <atomic>
+#include <memory>
 #include "DivFinder.h"
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -25,6 +26,7 @@
  *  	               populated for any issues.
  *
  *****************************************************************************************/
+using atomic_ptr_t = std::shared_ptr<std::atomic<bool>>;
 
 class DivFinderT : public DivFinder { 
    public:
@@ -35,7 +37,7 @@ class DivFinderT : public DivFinder {
 
       bool isPrimeBF(LARGEINT n, LARGEINT &divisor);
 
-      std::map<std::string, std::atomic_bool> atomicTable;
+      std::map<std::string, atomic_ptr_t> atomicTable;
 
    protected:
 

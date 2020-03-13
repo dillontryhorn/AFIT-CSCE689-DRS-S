@@ -104,8 +104,9 @@ void DivFinderT::factor(LARGEINT n) {
 
    std::string bignumstr;
    bignumstr  = boost::lexical_cast<std::string>(n);
-   std::atomic_bool aBool = ATOMIC_VAR_INIT(false);
-   this->atomicTable.insert(std::pair<std::string, std::atomic_bool>(bignumstr, aBool));
+   //std::atomic_bool aBool = ATOMIC_VAR_INIT(false);
+   auto aBool = atomic_ptr_t(new std::atomic<bool>(false));
+   this->atomicTable.insert(std::make_pair(bignumstr, aBool));
 
    // already prime
    if (n == 1) {
