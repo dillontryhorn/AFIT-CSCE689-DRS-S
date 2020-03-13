@@ -39,8 +39,6 @@ class DivFinderT : public DivFinder {
 
       void isPrimeBF(LARGEINT n, atomic_ptr_t aBool);
 
-      std::map<std::string, atomic_ptr_t> atomicTable;
-
    protected:
 
       void factor(LARGEINT n);

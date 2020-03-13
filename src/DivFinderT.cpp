@@ -42,16 +42,19 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
       return;
    }
 
-   else if ((n % 2) == 0) {
-      primes.push_back(2);
-      *aBool = true; // tell the other treads to finish
-      return factor(n / 2);
-   } 
-   else if ((n & 3) == 0) {
-      primes.push_back(3);
-      *aBool = true; // tell the other treads to finish
-      return factor(n / 3);
-   }
+   //already taken care of before the start of factor
+   // else if ((n % 2) == 0) {
+   //    primes.push_back(2);
+   //    *aBool = true; // tell the other treads to finish
+   //    return factor(n / 2);
+   // } 
+   // else if ((n & 3) == 0) {
+   //    primes.push_back(3);
+   //    *aBool = true; // tell the other treads to finish
+   //    return factor(n / 3);
+   // }
+
+   //std::cout << "Brute force after intial checks\n";
 
    // Assumes all primes are to either side of 6k. Using 256 bit to avoid overflow
    // issues when calculating max range
@@ -59,8 +62,11 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
    #pragma omp parallel
    #pragma omp for
    for (LARGEINT2X k=5; k * k < n_256t; k = k+6) {
+      //std::cout << "Brute force in loop\n";
       if ((n_256t % k == 0) || (n_256t % (k+2) == 0)) {
          divisor = (LARGEINT) k;
+         //if (verbose >= 2)
+            std::cout << "Prime found: " << divisor << std::endl;
          primes.push_back(divisor);
          *aBool = true; // tell the other treads to finish
          return factor(n / divisor);
@@ -68,7 +74,7 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
       if(*aBool)
          return;
    }
-   if (verbose >= 2)
+   //if (verbose >= 2)
          std::cout << "Prime found: " << n << std::endl;
    primes.push_back(n);
    *aBool = true; // tell the other treads to finish
@@ -91,7 +97,7 @@ void DivFinderT::PolRho() {
    LARGEINT newval = getOrigVal();
    while (newval % 2 == 0) {
       primes.push_back(2);
-      if (verbose >= 2)
+      //if (verbose >= 2)
          std::cout << "Prime Found: 2\n";
       newval = newval / 2;
    } 
@@ -99,12 +105,14 @@ void DivFinderT::PolRho() {
    // Now the 3s
    while (newval % 3 == 0) {
       primes.push_back(3);
-      std::cout << "Prime Found: 3\n";
+      //if (verbose >= 2)
+         std::cout << "Prime Found: 3\n";
       newval = newval / 3;
    }
 
    // Now use Pollards Rho to figure out the rest. As it's stochastic, we don't know
    // how long it will take to find an answer. Should return the final two primes
+   //std::cout << "Trying to start\n";
    factor(newval);
    
 }
@@ -118,11 +126,8 @@ void DivFinderT::PolRho() {
  ******************************************************************************/
 
 void DivFinderT::factor(LARGEINT n) {
+   //std::cout << "Starting\n";
 
-   // std::string bignumstr;
-   // bignumstr  = boost::lexical_cast<std::string>(n);
-   // auto aBool = atomic_ptr_t(new std::atomic<bool>(false));
-   // this->atomicTable.insert(std::make_pair(bignumstr, aBool));
 
    // already prime
    if (n == 1) {
@@ -136,14 +141,17 @@ void DivFinderT::factor(LARGEINT n) {
 
    
    std::thread bf(&DivFinderT::isPrimeBF, this, n, aBool); // launch a thread on this isPrime call
-   			
+
+   std::vector<std::thread> thvec;	
    for(int i=0; i<(this->_num_threads - 1); i++)
    {
-      std::thread th(&DivFinderT::calcPollardsRho2, this, n, aBool); // launch the rest of the threads on PolRho
+      thvec.push_back(std::thread(&DivFinderT::calcPollardsRho2, this, n, aBool)); // launch the rest of the threads on PolRho
    }
-
-   // throw std::runtime_error("Reached end of function--this should not have happened.");
-   std::cout << "Exiting";
+   bf.join();
+   for(auto it = thvec.begin(); it != thvec.end(); it++)
+      (*it).join();
+   
+   std::cout << "Exiting\n";
    return;
 }
 
@@ -161,6 +169,9 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
    if (n <= 3)
       return; //brute force will handle
 
+
+   //std::cout << "Pol Rho after intial check\n";
+
    // Initialize our random number generator
    srand(time(NULL));
 
@@ -175,6 +186,7 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
 
    // Loop until either we find the gcd or gcd = 1
    while (d == 1) {
+      //std::cout << "Pol Rho in loop\n";
       if(*aBool)
          break;
       // "Tortoise move" - Update x to f(x) (modulo n)
