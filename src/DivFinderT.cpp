@@ -139,7 +139,7 @@ void DivFinderT::factor(LARGEINT n) {
    			
    for(int i=0; i<(this->_num_threads - 1); i++)
    {
-      std::thread th(&DivFinderT::calcPollardsRho2, this, n, aBool);
+      std::thread th(&DivFinderT::calcPollardsRho2, this, n, aBool); // launch the rest of the threads on PolRho
    }
 
    // throw std::runtime_error("Reached end of function--this should not have happened.");
