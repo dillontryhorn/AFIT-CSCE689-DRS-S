@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include <atomic>
+#include <thread>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/integer/common_factor.hpp>
 #include <boost/lexical_cast.hpp>
@@ -26,22 +27,30 @@ DivFinderT::~DivFinderT() {
  *
  *******************************************************************************/
 
-bool DivFinderT::isPrimeBF(LARGEINT n, LARGEINT &divisor) {
+void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
    if (verbose >= 3)
       std::cout << "Checking if prime: " << n << std::endl;
 
-   divisor = 0;
+   LARGEINT divisor = 0;
 
    // Take care of simple cases
-   if (n <= 3) {
-      return n > 1;
+   if (n <= 3 && n > 1) {
+      if (verbose >= 2)
+         std::cout << "Prime found: " << n << std::endl;
+      primes.push_back(n);
+      *aBool = true; // tell the other treads to finish
+      return;
    }
+
    else if ((n % 2) == 0) {
-      divisor = 2;
-      return false;
-   } else if ((n & 3) == 0) {
-      divisor = 3;
-      return false;
+      primes.push_back(2);
+      *aBool = true; // tell the other treads to finish
+      return factor(n / 2);
+   } 
+   else if ((n & 3) == 0) {
+      primes.push_back(3);
+      *aBool = true; // tell the other treads to finish
+      return factor(n / 3);
    }
 
    // Assumes all primes are to either side of 6k. Using 256 bit to avoid overflow
@@ -52,10 +61,18 @@ bool DivFinderT::isPrimeBF(LARGEINT n, LARGEINT &divisor) {
    for (LARGEINT2X k=5; k * k < n_256t; k = k+6) {
       if ((n_256t % k == 0) || (n_256t % (k+2) == 0)) {
          divisor = (LARGEINT) k;
-         return false;
+         primes.push_back(divisor);
+         *aBool = true; // tell the other treads to finish
+         return factor(n / divisor);
       }
+      if(*aBool)
+         return;
    }
-   return true;
+   if (verbose >= 2)
+         std::cout << "Prime found: " << n << std::endl;
+   primes.push_back(n);
+   *aBool = true; // tell the other treads to finish
+   return;
 }
 
 /*******************************************************************************
@@ -102,11 +119,10 @@ void DivFinderT::PolRho() {
 
 void DivFinderT::factor(LARGEINT n) {
 
-   std::string bignumstr;
-   bignumstr  = boost::lexical_cast<std::string>(n);
-   //std::atomic_bool aBool = ATOMIC_VAR_INIT(false);
-   auto aBool = atomic_ptr_t(new std::atomic<bool>(false));
-   this->atomicTable.insert(std::make_pair(bignumstr, aBool));
+   // std::string bignumstr;
+   // bignumstr  = boost::lexical_cast<std::string>(n);
+   // auto aBool = atomic_ptr_t(new std::atomic<bool>(false));
+   // this->atomicTable.insert(std::make_pair(bignumstr, aBool));
 
    // already prime
    if (n == 1) {
@@ -116,43 +132,29 @@ void DivFinderT::factor(LARGEINT n) {
    if (verbose >= 2)
       std::cout << "Factoring: " << n << std::endl;
 
-   bool div_found = false;
+   auto aBool = atomic_ptr_t(new std::atomic<bool>(false));
 
-   while (!div_found)
+   
+   std::thread bf(&DivFinderT::isPrimeBF, n, aBool); // launch a thread on this isPrime call
+   			
+   
+
+   // We try to get a divisor using Pollards Rho, might need to stop and rerandomize
+   LARGEINT d = calcPollardsRho(n); // launch of bunch of threads on this
+   if (d != n)
    {
-      LARGEINT divisor; // try to get a divisor by brute6
-      if (isPrimeBF(n, divisor)) // launch a thread on this isPrime call
-      {
-         if (verbose >= 2)
-            std::cout << "Prime found: " << n << std::endl;
-         primes.push_back(n);
-         return;
-      } // if returns true n is prime, else divisor is set
-      else
-      {   // We found a prime divisor, save it and keep finding primes
-	      if (verbose >= 2)
-	         std::cout << "Prime found: " << divisor << std::endl;
-	      primes.push_back(divisor);
-	      return factor(n / divisor); // obsiusly dont try to factor the prime
-	   }				
-      
+      if (verbose >= 1)
+         std::cout << "Divisor found: " << d << std::endl;
 
-      // We try to get a divisor using Pollards Rho, might need to stop and rerandomize
-      LARGEINT d = calcPollardsRho(n); // launch of bunch of threads on this
-      if (d != n)
-      {
-         if (verbose >= 1)
-            std::cout << "Divisor found: " << d << std::endl;
+      // Factor the divisor
+      factor(d); // this is the recursive call, need to figure how to split
+                  // the threads with factoring d and n/d which is the line under
 
-         // Factor the divisor
-         factor(d); // this is the recursive call, need to figure how to split
-                     // the threads with factoring d and n/d which is the line under
+      // Now the remaining number
+      factor((LARGEINT) (n/d));
+      return;
+   }	
 
-         // Now the remaining number
-         factor((LARGEINT) (n/d));
-         return;
-      }	
-   }
    throw std::runtime_error("Reached end of function--this should not have happened.");
    return;
 }

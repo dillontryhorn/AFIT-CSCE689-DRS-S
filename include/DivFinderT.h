@@ -35,7 +35,7 @@ class DivFinderT : public DivFinder {
 
       virtual void PolRho() override;
 
-      bool isPrimeBF(LARGEINT n, LARGEINT &divisor);
+      void isPrimeBF(LARGEINT n, atomic_ptr_t aBool);
 
       std::map<std::string, atomic_ptr_t> atomicTable;
 
