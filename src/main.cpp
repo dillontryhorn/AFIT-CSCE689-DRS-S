@@ -11,6 +11,7 @@ void displayHelp(const char* execname)
     std::cout << "Proper usage: " << execname << " <large number> " << std::endl;
     std::cout << "   v: verbosity level (0-3)\n";
     std::cout << "   t: maximum number of threads to use\n";
+    std::cout << " Try: 3840973478624489797261566375423382807\n";
     exit(0);
 }
 

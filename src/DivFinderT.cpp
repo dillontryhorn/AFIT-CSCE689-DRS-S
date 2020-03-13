@@ -42,13 +42,17 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
       return;
    }
 
-   //already taken care of before the start of factor
+   //already taken care of before the start of factor?
    // else if ((n % 2) == 0) {
+   //    if (verbose >= 2)
+   //       std::cout << "Prime found: " << 2 << std::endl;
    //    primes.push_back(2);
    //    *aBool = true; // tell the other treads to finish
    //    return factor(n / 2);
    // } 
    // else if ((n & 3) == 0) {
+   //    if (verbose >= 2)
+   //       std::cout << "Prime found: " << 3 << std::endl;
    //    primes.push_back(3);
    //    *aBool = true; // tell the other treads to finish
    //    return factor(n / 3);
@@ -151,7 +155,7 @@ void DivFinderT::factor(LARGEINT n) {
    for(auto it = thvec.begin(); it != thvec.end(); it++)
       (*it).join();
    
-   std::cout << "Exiting\n";
+   // std::cout << "Exiting\n";
    return;
 }
 
