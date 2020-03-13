@@ -34,6 +34,8 @@ class DivFinderT : public DivFinder {
       virtual ~DivFinderT();
 
       virtual void PolRho() override;
+      
+      void calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool);
 
       void isPrimeBF(LARGEINT n, atomic_ptr_t aBool);
 

@@ -137,25 +137,74 @@ void DivFinderT::factor(LARGEINT n) {
    
    std::thread bf(&DivFinderT::isPrimeBF, n, aBool); // launch a thread on this isPrime call
    			
-   
-
-   // We try to get a divisor using Pollards Rho, might need to stop and rerandomize
-   LARGEINT d = calcPollardsRho(n); // launch of bunch of threads on this
-   if (d != n)
+   for(int i=0; i<(this->_num_threads - 1); i++)
    {
-      if (verbose >= 1)
-         std::cout << "Divisor found: " << d << std::endl;
+      std::thread th(&DivFinderT::calcPollardsRho2, n);
+   }
 
-      // Factor the divisor
-      factor(d); // this is the recursive call, need to figure how to split
-                  // the threads with factoring d and n/d which is the line under
-
-      // Now the remaining number
-      factor((LARGEINT) (n/d));
-      return;
-   }	
-
-   throw std::runtime_error("Reached end of function--this should not have happened.");
+   // throw std::runtime_error("Reached end of function--this should not have happened.");
+   std::cout << "Exiting";
    return;
 }
 
+
+
+/**********************************************************************************************
+ * calcPollardsRho - Do the actual Pollards Rho calculations to attempt to find a divisor
+ *
+ *    Params:  n - the number to find a divisor within
+ *
+ *
+ **********************************************************************************************/
+
+void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
+   if (n <= 3)
+      return; //brute force will handle
+
+   // Initialize our random number generator
+   srand(time(NULL));
+
+   // pick a random number from the range [2, N)
+   LARGEINT2X x = (rand()%(n-2)) + 2;
+   LARGEINT2X y = x;    // Per the algorithm
+
+   // random number for c = [1, N)
+   LARGEINT2X c = (rand()%(n-1)) + 1;
+
+   LARGEINT2X d = 1;
+
+   // Loop until either we find the gcd or gcd = 1
+   while (d == 1) {
+      if(*aBool)
+         break
+      // "Tortoise move" - Update x to f(x) (modulo n)
+      // f(x) = x^2 + c f
+      x = (modularPow(x, 2, n) + c + n) % n;
+
+      // "Hare move" - Update y to f(f(y)) (modulo n)
+      y = (modularPow(y, 2, n) + c + n) % n;
+      y = (modularPow(y, 2, n) + c + n) % n;
+
+      // Calculate GCD of |x-y| and tn
+      LARGESIGNED2X z = (LARGESIGNED2X) x - (LARGESIGNED2X) y;
+      if (z < 0)
+         d = boost::math::gcd((LARGEINT2X) -z, (LARGEINT2X) n);
+      else
+         d = boost::math::gcd((LARGEINT2X) z, (LARGEINT2X) n);
+
+      // If we found a divisor, factor primes out of each side of the divisor
+      if ((d != 1) && (d != n)) {
+         if (verbose >= 1)
+            std::cout << "Divisor found: " << d << std::endl;
+
+         // Factor the divisor
+         *aBool = true;
+         factor((LARGEINT) d);
+         // factor the remaining number
+         factor((LARGEINT) (n/d));
+         return;
+
+      }
+   }
+   return;
+}
