@@ -176,7 +176,7 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
    // Loop until either we find the gcd or gcd = 1
    while (d == 1) {
       if(*aBool)
-         break
+         break;
       // "Tortoise move" - Update x to f(x) (modulo n)
       // f(x) = x^2 + c f
       x = (modularPow(x, 2, n) + c + n) % n;
