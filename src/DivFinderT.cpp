@@ -70,7 +70,7 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
       if ((n_256t % k == 0) || (n_256t % (k+2) == 0)) {
          *aBool = true; // tell the other treads to finish
          divisor = (LARGEINT) k;
-         //if (verbose >= 2)
+         if (verbose >= 2)
             std::cout << "Prime found: " << divisor << std::endl;
          primes.push_back(divisor); // this is incorrect, not a prime neccesarily
          return factor(n / divisor);
@@ -79,7 +79,7 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
          return;
    }
    *aBool = true; // tell the other treads to finish
-   //if (verbose >= 2)
+   if (verbose >= 2)
          std::cout << "Prime found: " << n << std::endl;
    primes.push_back(n);
    return;
@@ -101,7 +101,7 @@ void DivFinderT::PolRho() {
    LARGEINT newval = getOrigVal();
    while (newval % 2 == 0) {
       primes.push_back(2);
-      //if (verbose >= 2)
+      if (verbose >= 2)
          std::cout << "Prime Found: 2\n";
       newval = newval / 2;
    } 
@@ -109,7 +109,7 @@ void DivFinderT::PolRho() {
    // Now the 3s
    while (newval % 3 == 0) {
       primes.push_back(3);
-      //if (verbose >= 2)
+      if (verbose >= 2)
          std::cout << "Prime Found: 3\n";
       newval = newval / 3;
    }
@@ -117,7 +117,7 @@ void DivFinderT::PolRho() {
    // Now the 5s
    while (newval % 5 == 0) {
       primes.push_back(5);
-      //if (verbose >= 2)
+      if (verbose >= 2)
          std::cout << "Prime Found: 5\n";
       newval = newval / 5;
    }
@@ -220,8 +220,8 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
 
          // If we found a divisor, factor primes out of each side of the divisor
          if ((d != 1) && (d != n)) {
-            //if (verbose >= 1)
-               // std::cout << "Divisor found: " << d << std::endl;
+            if (verbose >= 1)
+               std::cout << "Divisor found: " << d << std::endl;
                // Factor the divisor
             *aBool = true;
             factor((LARGEINT) d);
