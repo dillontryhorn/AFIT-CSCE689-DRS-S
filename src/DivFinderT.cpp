@@ -68,11 +68,11 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
    for (LARGEINT2X k=5; k * k < n_256t; k = k+6) {
       //std::cout << "Brute force in loop\n";
       if ((n_256t % k == 0) || (n_256t % (k+2) == 0)) {
+         *aBool = true; // tell the other treads to finish
          divisor = (LARGEINT) k;
          //if (verbose >= 2)
             std::cout << "Prime found: " << divisor << std::endl;
          primes.push_back(divisor);
-         *aBool = true; // tell the other treads to finish
          return factor(n / divisor);
       }
       if(*aBool)
@@ -116,7 +116,7 @@ void DivFinderT::PolRho() {
 
    // Now use Pollards Rho to figure out the rest. As it's stochastic, we don't know
    // how long it will take to find an answer. Should return the final two primes
-   //std::cout << "Trying to start\n";
+   // std::cout << "Trying to start\n";
    factor(newval);
    
 }
@@ -210,8 +210,8 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
 
       // If we found a divisor, factor primes out of each side of the divisor
       if ((d != 1) && (d != n)) {
-         if (verbose >= 1)
-            std::cout << "Divisor found: " << d << std::endl;
+         //if (verbose >= 1)
+            //std::cout << "Divisor found: " << d << std::endl;
 
          // Factor the divisor
          *aBool = true;
