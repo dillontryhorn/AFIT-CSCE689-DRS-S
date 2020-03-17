@@ -175,7 +175,6 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
 
 
    //std::cout << "Pol Rho after intial check\n";
-   bool divFound = false;
    while(!aBool)
    {
       // Initialize our random number generator
