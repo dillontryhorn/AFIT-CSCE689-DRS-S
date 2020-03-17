@@ -78,10 +78,10 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
       if(*aBool)
          return;
    }
+   *aBool = true; // tell the other treads to finish
    //if (verbose >= 2)
          std::cout << "Prime found: " << n << std::endl;
    primes.push_back(n);
-   *aBool = true; // tell the other treads to finish
    return;
 }
 
@@ -175,51 +175,52 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
 
 
    //std::cout << "Pol Rho after intial check\n";
+   bool divFound = false;
+   while(!aBool)
+   {
+      // Initialize our random number generator
+      srand(time(NULL));
 
-   // Initialize our random number generator
-   srand(time(NULL));
+      // pick a random number from the range [2, N)
+      LARGEINT2X x = (rand()%(n-2)) + 2;
+      LARGEINT2X y = x;    // Per the algorithm
 
-   // pick a random number from the range [2, N)
-   LARGEINT2X x = (rand()%(n-2)) + 2;
-   LARGEINT2X y = x;    // Per the algorithm
+      // random number for c = [1, N)
+      LARGEINT2X c = (rand()%(n-1)) + 1;
 
-   // random number for c = [1, N)
-   LARGEINT2X c = (rand()%(n-1)) + 1;
+      LARGEINT2X d = 1;
 
-   LARGEINT2X d = 1;
+      // Loop until either we find the gcd or gcd = 1
+      while (d == 1) {
+         //std::cout << "Pol Rho in loop\n";
+         if(*aBool)
+            break;
+         // "Tortoise move" - Update x to f(x) (modulo n)
+         // f(x) = x^2 + c f
+         x = (modularPow(x, 2, n) + c + n) % n;
 
-   // Loop until either we find the gcd or gcd = 1
-   while (d == 1) {
-      //std::cout << "Pol Rho in loop\n";
-      if(*aBool)
-         break;
-      // "Tortoise move" - Update x to f(x) (modulo n)
-      // f(x) = x^2 + c f
-      x = (modularPow(x, 2, n) + c + n) % n;
+         // "Hare move" - Update y to f(f(y)) (modulo n)
+         y = (modularPow(y, 2, n) + c + n) % n;
+         y = (modularPow(y, 2, n) + c + n) % n;
 
-      // "Hare move" - Update y to f(f(y)) (modulo n)
-      y = (modularPow(y, 2, n) + c + n) % n;
-      y = (modularPow(y, 2, n) + c + n) % n;
+         // Calculate GCD of |x-y| and tn
+         LARGESIGNED2X z = (LARGESIGNED2X) x - (LARGESIGNED2X) y;
+         if (z < 0)
+            d = boost::math::gcd((LARGEINT2X) -z, (LARGEINT2X) n);
+         else
+            d = boost::math::gcd((LARGEINT2X) z, (LARGEINT2X) n);
 
-      // Calculate GCD of |x-y| and tn
-      LARGESIGNED2X z = (LARGESIGNED2X) x - (LARGESIGNED2X) y;
-      if (z < 0)
-         d = boost::math::gcd((LARGEINT2X) -z, (LARGEINT2X) n);
-      else
-         d = boost::math::gcd((LARGEINT2X) z, (LARGEINT2X) n);
-
-      // If we found a divisor, factor primes out of each side of the divisor
-      if ((d != 1) && (d != n)) {
-         //if (verbose >= 1)
-            //std::cout << "Divisor found: " << d << std::endl;
-
-         // Factor the divisor
-         *aBool = true;
-         factor((LARGEINT) d);
-         // factor the remaining number
-         factor((LARGEINT) (n/d));
-         return;
-
+         // If we found a divisor, factor primes out of each side of the divisor
+         if ((d != 1) && (d != n)) {
+            //if (verbose >= 1)
+               //std::cout << "Divisor found: " << d << std::endl;
+               // Factor the divisor
+            *aBool = true;
+            factor((LARGEINT) d);
+            // factor the remaining number
+            factor((LARGEINT) (n/d));
+            return;
+         }
       }
    }
    return;
