@@ -10,7 +10,7 @@ void displayHelp(const char* execname)
 {
     std::cout << "Proper usage: " << execname << " <large number> <verbosity (0-3)> <number of threads (1-10000)> <run single-threaded (true/false)>" << std::endl;
     std::cout << "Example: " << execname << " 10000 3 4 false" << std::endl;
-    std::cout << "Maximum Number: 3840973478624489797261566375423382807" << std::endl;
+    std::cout << "Try: 3840973478624489797261566375423382807" << std::endl;
     exit(0);
 }
 
