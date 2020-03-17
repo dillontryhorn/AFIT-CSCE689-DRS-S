@@ -31,7 +31,16 @@ int main(int argc, char* argv[])
         std::cout << "Number of threads must be between 1-10000" << std::endl;
         exit(0);
     }
-    bool use_singlethread = static_cast<bool>(argv[4]);
+
+    bool use_singlethread;
+    if(std::string(argv[4]) == "true" || std::string(argv[4]) == "True" || std::string(argv[4]) == "1")
+        use_singlethread = true;
+    else if((std::string(argv[4]) == "false" || std::string(argv[4]) == "False" || std::string(argv[4]) == "0"))
+        use_singlethread = false;
+    else {
+        std::cout << "invalid choice for single_threaded\n\n";
+        displayHelp(argv[0]); }
+    
 
     if(use_singlethread)
     {
