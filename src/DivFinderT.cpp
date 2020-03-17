@@ -72,7 +72,7 @@ void DivFinderT::isPrimeBF(LARGEINT n, atomic_ptr_t aBool) {
          divisor = (LARGEINT) k;
          //if (verbose >= 2)
             std::cout << "Prime found: " << divisor << std::endl;
-         primes.push_back(divisor);
+         primes.push_back(divisor); // this is incorrect, not a prime neccesarily
          return factor(n / divisor);
       }
       if(*aBool)
@@ -112,6 +112,14 @@ void DivFinderT::PolRho() {
       //if (verbose >= 2)
          std::cout << "Prime Found: 3\n";
       newval = newval / 3;
+   }
+
+   // Now the 5s
+   while (newval % 5 == 0) {
+      primes.push_back(5);
+      //if (verbose >= 2)
+         std::cout << "Prime Found: 5\n";
+      newval = newval / 5;
    }
 
    // Now use Pollards Rho to figure out the rest. As it's stochastic, we don't know
@@ -175,7 +183,7 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
 
 
    //std::cout << "Pol Rho after intial check\n";
-   while(!aBool)
+   while(!(*aBool))
    {
       // Initialize our random number generator
       srand(time(NULL));
@@ -190,7 +198,8 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
       LARGEINT2X d = 1;
 
       // Loop until either we find the gcd or gcd = 1
-      while (d == 1) {
+      while (d == 1)
+      {
          //std::cout << "Pol Rho in loop\n";
          if(*aBool)
             break;
@@ -212,7 +221,7 @@ void DivFinderT::calcPollardsRho2(LARGEINT n, atomic_ptr_t aBool) {
          // If we found a divisor, factor primes out of each side of the divisor
          if ((d != 1) && (d != n)) {
             //if (verbose >= 1)
-               //std::cout << "Divisor found: " << d << std::endl;
+               // std::cout << "Divisor found: " << d << std::endl;
                // Factor the divisor
             *aBool = true;
             factor((LARGEINT) d);

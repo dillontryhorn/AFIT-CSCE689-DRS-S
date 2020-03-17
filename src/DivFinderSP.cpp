@@ -117,19 +117,20 @@ void DivFinderSP::factor(LARGEINT n) {
       // iters after the check
       if (iters++ == primecheck_depth) {
          if (verbose >= 2)
-	    std::cout << "Pollards rho timed out, checking if the following is prime: " << n << std::endl;
-	 LARGEINT divisor;
+	         std::cout << "Pollards rho timed out, checking if the following is prime: " << n << std::endl;
+	      LARGEINT divisor;
          if (isPrimeBF(n, divisor)) {
-	    if (verbose >= 2)
-	       std::cout << "Prime found: " << n << std::endl;
+	         if (verbose >= 2)
+	            std::cout << "Prime found: " << n << std::endl;
             primes.push_back(n);
-	    return;
-	 } else {   // We found a prime divisor, save it and keep finding primes
-	    if (verbose >= 2)
-	       std::cout << "Prime found: " << divisor << std::endl;
-	    primes.push_back(divisor);
-	    return factor(n / divisor);
-	 }				
+	         return;
+	      }
+         else {   // We found a prime divisor, save it and keep finding primes
+	         if (verbose >= 2)
+	            std::cout << "Prime found: " << divisor << std::endl;
+	         primes.push_back(divisor);
+	         return factor(n / divisor);
+	      }				
       }
 
       // We try to get a divisor using Pollards Rho
